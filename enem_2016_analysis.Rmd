@@ -218,7 +218,14 @@ dados %>% group_by(TP_SEXO) %>%
           dplyr::summarise(statistic = ad.test(NU_NOTA_REDACAO)$statistic,
                     p.value = ad.test(NU_NOTA_REDACAO)$p.value) 
 ```
-Nota-se que o valor p é < 0.05, tornando o teste significativo e rejeitando a hipótese nula (as amostras foram retiradas de populações com médias iguais). 
+
+Pelas amostras não proverem de uma população com distribuição normal e as mesmas são independentes, aplica-se o teste de Wilcoxon-Mann-Whitney para verificar a igualdade das medianas dos grupos.
+
+```{r}
+wilcox.test(NU_NOTA_REDACAO ~ TP_SEXO, data=dados) 
+```
+
+Nota-se que o valor p é < 0.05, tornando o teste significativo e rejeitando a hipótese nula (as amostras foram retiradas de populações com medianas iguais). 
 Conclui-se que há diferença significativa (ao nível de 5% de significância) de nota de redação para sexos diferentes.
 
 ```{r}
@@ -227,7 +234,7 @@ ggplot(dados, aes_string(x = "NU_NOTA_REDACAO", color = "TP_COR_RACA", fill = "T
   geom_density(alpha = 0.3) + labs(title = "Figura 10: Distribuição de probabilidade para nota de redação", subtitle = "por cor/raça")
 kruskal.test(NU_NOTA_REDACAO ~ as.factor(TP_COR_RACA), data = dados)
 ```
-O teste mostra que pelo menos uma diferença significativa entre as medianas do grupo de seis amostras.
+Como agora são mais de duas amostras, utiliza-se o teste de Kruskall para comparar as medianas. O teste mostra que há pelo menos uma diferença significativa entre as medianas do grupo de seis amostras.
 
 ```{r}
 dados %>% group_by(Q006) %>% dplyr::summarise(MEDIA_REDACAO = mean(NU_NOTA_REDACAO, na.rm = TRUE))

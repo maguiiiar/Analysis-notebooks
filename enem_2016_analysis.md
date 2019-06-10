@@ -663,7 +663,24 @@ dados %>% group_by(TP_SEXO) %>%
 ## 1 F            61.5 3.70e-24
 ## 2 M            43.5 3.70e-24
 ```
-Nota-se que o valor p é < 0.05, tornando o teste significativo e rejeitando a hipótese nula (as amostras foram retiradas de populações com médias iguais). 
+
+Pelas amostras não proverem de uma população com distribuição normal e as mesmas são independentes, aplica-se o teste de Wilcoxon-Mann-Whitney para verificar a igualdade das medianas dos grupos.
+
+
+```r
+wilcox.test(NU_NOTA_REDACAO ~ TP_SEXO, data=dados) 
+```
+
+```
+## 
+## 	Wilcoxon rank sum test with continuity correction
+## 
+## data:  NU_NOTA_REDACAO by TP_SEXO
+## W = 13244000, p-value = 3.965e-15
+## alternative hypothesis: true location shift is not equal to 0
+```
+
+Nota-se que o valor p é < 0.05, tornando o teste significativo e rejeitando a hipótese nula (as amostras foram retiradas de populações com medianas iguais). 
 Conclui-se que há diferença significativa (ao nível de 5% de significância) de nota de redação para sexos diferentes.
 
 
@@ -692,7 +709,7 @@ ggplot(dados, aes_string(x = "NU_NOTA_REDACAO", color = "TP_COR_RACA", fill = "T
 ## Warning: Removed 3597 rows containing non-finite values (stat_density).
 ```
 
-![](enem_2016_analysis_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+![](enem_2016_analysis_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 ```r
 kruskal.test(NU_NOTA_REDACAO ~ as.factor(TP_COR_RACA), data = dados)
@@ -705,7 +722,7 @@ kruskal.test(NU_NOTA_REDACAO ~ as.factor(TP_COR_RACA), data = dados)
 ## data:  NU_NOTA_REDACAO by as.factor(TP_COR_RACA)
 ## Kruskal-Wallis chi-squared = 187.6, df = 5, p-value < 2.2e-16
 ```
-O teste mostra que pelo menos uma diferença significativa entre as medianas do grupo de seis amostras.
+Como agora são mais de duas amostras, utiliza-se o teste de Kruskall para comparar as medianas. O teste mostra que há pelo menos uma diferença significativa entre as medianas do grupo de seis amostras.
 
 
 ```r
@@ -744,7 +761,7 @@ ggplot(dados, aes_string(x = "NU_NOTA_REDACAO", color = "Q006", fill = "Q006")) 
 ## Warning: Removed 3597 rows containing non-finite values (stat_density).
 ```
 
-![](enem_2016_analysis_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+![](enem_2016_analysis_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ```r
 kruskal.test(NU_NOTA_REDACAO ~ as.factor(Q006), data = dados)
@@ -814,14 +831,14 @@ print(results)
 ## 
 ## Resampling performance over subset size:
 ## 
-##  Variables  RMSE Rsquared   MAE RMSESD RsquaredSD MAESD Selected
-##          4 62.02   0.3035 48.62  1.744    0.03168 1.106         
-##          8 62.06   0.2999 48.43  2.087    0.03685 1.148         
-##         16 61.17   0.3198 47.70  2.103    0.03861 1.401         
-##        127 59.95   0.3599 46.90  1.827    0.03023 1.272        *
+##  Variables  RMSE Rsquared   MAE RMSESD RsquaredSD  MAESD Selected
+##          4 61.61   0.3005 48.89  2.166    0.03413 1.1592         
+##          8 61.07   0.3072 47.89  1.425    0.03250 0.8809         
+##         16 61.33   0.3009 48.65  1.192    0.01314 1.1597         
+##        127 61.05   0.3186 48.50  1.378    0.01597 1.0300        *
 ## 
 ## The top 5 variables (out of 127):
-##    TP_STATUS_REDACAO, Q042, Q047, Q024, Q006
+##    TP_STATUS_REDACAO, Q047, Q006, Q042, Q037
 ```
 
 ```r
@@ -831,7 +848,7 @@ selected_var =  c(predictors(results)[1:16], "NOTA_FINAL")
 plot(results, type=c("g", "o"))
 ```
 
-![](enem_2016_analysis_files/figure-html/unnamed-chunk-21-1.png)<!-- -->
+![](enem_2016_analysis_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
 Nota-se que o RMSE mais baixo é o selecionando 16 variáveis. Assim, filtra-se a base com as mesmas para análises mais profundas.
 
 
@@ -853,7 +870,7 @@ plot(fit) # display dendogram
 rect.hclust(fit, k=3, border="red")
 ```
 
-![](enem_2016_analysis_files/figure-html/unnamed-chunk-22-1.png)<!-- -->
+![](enem_2016_analysis_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 ```r
 groups <- data.frame(CLUSTER = cutree(fit, k=3)) # cut tree into 3 clusters
@@ -880,16 +897,16 @@ segment.db.clusters.num
 ## # Groups:   variable [1]
 ##   variable   CLUSTER  mean
 ##   <fct>        <int> <dbl>
-## 1 NOTA_FINAL       1  454.
-## 2 NOTA_FINAL       2  531.
-## 3 NOTA_FINAL       3  617.
+## 1 NOTA_FINAL       1  455.
+## 2 NOTA_FINAL       2  545.
+## 3 NOTA_FINAL       3  648.
 ```
 
 ```r
 bars
 ```
 
-![](enem_2016_analysis_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+![](enem_2016_analysis_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 O cluster 3 é o que possui nota média mais alta e verifica-se um perfil dentro desse cluster.
 Na variável Q047, por exemplo, pergunta-se em que tipo de escola o aluno frequentou no ensino médio. O cluster 3 (azul), domina os dois últimos níveis da variável, as quais se relacionam a escolas privadas. A Q042 segue a mesma tendência: domínio nos níveis C e D: opções que envolvem escolas privadas durante o ensino fundamental. A Q006 (renda familiar) é outra evidência: quanto maior a renda da família, maior a quantidade de domínio do cluster 3. Pode-se afirmar, portanto, que altas notas estão ligadas a rendas elevadas (Q006), ensino em escolas privadas (Q042, Q047), o pai finalizou pós graduação (Q001), o objetivo de realizar a prova para obter uma bolsa de estudos é um dos fatores menos importantes (Q037), entre outros parâmetros.
